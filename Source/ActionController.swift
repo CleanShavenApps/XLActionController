@@ -400,12 +400,12 @@ open class ActionController<ActionViewType: UICollectionViewCell, ActionDataType
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let action = self.actionForIndexPath(actionIndexPathFor(indexPath))
 
-        if let action = action, action.executeImmediatelyOnTouch {
-            action.handler?(action)
+        if let action = action {
+            action.onTouchedHandler?(action)
         }
 
         self.dismiss() {
-            if let action = action, !action.executeImmediatelyOnTouch {
+            if let action = action {
                 action.handler?(action)
             }
         }

@@ -35,18 +35,18 @@ public enum ActionStyle {
 public struct Action<T> {
 
     public var enabled: Bool
-    public var executeImmediatelyOnTouch = false
 
     public fileprivate(set) var data: T?
     public fileprivate(set) var style = ActionStyle.default
     public fileprivate(set) var handler: ((Action<T>) -> Void)?
+    public fileprivate(set) var onTouchedHandler: ((Action<T>) -> Void)?
 
-    public init(_ data: T?, style: ActionStyle, executeImmediatelyOnTouch: Bool = false, handler: ((Action<T>) -> Void)?) {
+    public init(_ data: T?, style: ActionStyle, handler: ((Action<T>) -> Void)?, onTouchedHandler: ((Action<T>) -> Void)? = nil) {
         enabled = true
-        self.executeImmediatelyOnTouch = executeImmediatelyOnTouch
         self.data = data
         self.style = style
         self.handler = handler
+        self.onTouchedHandler = onTouchedHandler
     }
 
 }
