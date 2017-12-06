@@ -112,6 +112,7 @@ open class ActionController<ActionViewType: UICollectionViewCell, ActionDataType
     open var contentHeight: CGFloat = 0.0
 
     open var cancelView: UIView?
+    var cancelButton: UIButton?
 
     lazy open var backgroundView: UIView = {
         let backgroundView = UIView()
@@ -279,16 +280,16 @@ open class ActionController<ActionViewType: UICollectionViewCell, ActionDataType
                     let cancel = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.size.width, height: settings.cancelView.height))
                     cancel.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
                     cancel.backgroundColor = settings.cancelView.backgroundColor
-                    let cancelButton: UIButton = {
+                    cancelButton = {
                         let cancelButton = UIButton(frame: CGRect(x: 0, y: 0, width: 100, height: settings.cancelView.height))
                         cancelButton.addTarget(self, action: #selector(ActionController.cancelButtonDidTouch(_:)), for: .touchUpInside)
                         cancelButton.setTitle(settings.cancelView.title, for: UIControlState())
                         cancelButton.translatesAutoresizingMaskIntoConstraints = false
                         return cancelButton
                     }()
-                    cancel.addSubview(cancelButton)
-                    cancel.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[button]|", options: NSLayoutFormatOptions(), metrics: nil, views: ["button": cancelButton]))
-                    cancel.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[button]|", options: NSLayoutFormatOptions(), metrics: nil, views: ["button": cancelButton]))
+                    cancel.addSubview(cancelButton!)
+                    cancel.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[button]|", options: NSLayoutFormatOptions(), metrics: nil, views: ["button": cancelButton!]))
+                    cancel.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[button]|", options: NSLayoutFormatOptions(), metrics: nil, views: ["button": cancelButton!]))
                     return cancel
                 }()
             }
@@ -317,6 +318,13 @@ open class ActionController<ActionViewType: UICollectionViewCell, ActionDataType
                 self?.presentingViewController?.view.transform = CGAffineTransform(scaleX: scale.width, y: scale.height)
             }
         }, completion: nil)
+    }
+    
+    @available(iOS 11.0, *)
+    open override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+
+        setUpContentInsetForHeight(view.frame.height)
     }
 
     override open func viewDidLayoutSubviews() {
@@ -531,7 +539,17 @@ open class ActionController<ActionViewType: UICollectionViewCell, ActionDataType
     
     open func performCustomPresentationAnimation(_ presentedView: UIView, presentingView: UIView) {
         backgroundView.alpha = 1.0
-        cancelView?.frame.origin.y = view.bounds.size.height - settings.cancelView.height
+        if #available(iOS 11.0, *) {
+            if self.view.safeAreaInsets.bottom == 0 {
+                cancelView?.frame.origin.y = view.bounds.size.height - settings.cancelView.height
+            }
+            else {
+                cancelView?.frame.origin.y = view.bounds.size.height - settings.cancelView.height - self.view.safeAreaInsets.bottom + 10
+            }
+        }
+        else {
+            cancelView?.frame.origin.y = view.bounds.size.height - settings.cancelView.height
+        }
         collectionView.frame = view.bounds
         // Override this to add custom animations. This method is performed within the presentation animation block
     }
@@ -614,6 +632,17 @@ open class ActionController<ActionViewType: UICollectionViewCell, ActionDataType
         }
         
         topInset = max(topInset, max(30, height - contentHeight))
+        
+        if #available(iOS 11.0, *) {
+            topInset -= self.view.safeAreaInsets.bottom
+            
+            if let cancelView = cancelView, let cancelButton = cancelButton {
+                var cancelViewFrame = cancelView.frame
+                cancelViewFrame.size.height = settings.cancelView.height + self.view.safeAreaInsets.bottom
+                cancelView.frame = cancelViewFrame
+                cancelButton.titleEdgeInsets = UIEdgeInsetsMake(0, 0, self.view.safeAreaInsets.bottom, 0)
+            }
+        }
         
         collectionView.contentInset = UIEdgeInsets(top: topInset, left: currentInset.left, bottom: bottomInset, right: currentInset.right)
     }
