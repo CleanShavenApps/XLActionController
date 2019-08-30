@@ -236,9 +236,9 @@ open class ActionController<ActionViewType: UICollectionViewCell, ActionDataType
         if let headerSpec = headerSpec, let _ = headerData {
             switch headerSpec {
             case .cellClass:
-                collectionView.register(HeaderViewType.self, forSupplementaryViewOfKind:UICollectionElementKindSectionHeader, withReuseIdentifier: ReusableViewIds.Header.rawValue)
+                collectionView.register(HeaderViewType.self, forSupplementaryViewOfKind:UICollectionView.elementKindSectionHeader, withReuseIdentifier: ReusableViewIds.Header.rawValue)
             case .nibFile(let nibName, let bundle, _):
-                collectionView.register(UINib(nibName: nibName, bundle: bundle), forSupplementaryViewOfKind:UICollectionElementKindSectionHeader, withReuseIdentifier: ReusableViewIds.Header.rawValue)
+                collectionView.register(UINib(nibName: nibName, bundle: bundle), forSupplementaryViewOfKind:UICollectionView.elementKindSectionHeader, withReuseIdentifier: ReusableViewIds.Header.rawValue)
             }
         }
         
@@ -246,9 +246,9 @@ open class ActionController<ActionViewType: UICollectionViewCell, ActionDataType
         if let headerSpec = sectionHeaderSpec {
             switch headerSpec {
             case .cellClass:
-                collectionView.register(SectionHeaderViewType.self, forSupplementaryViewOfKind:UICollectionElementKindSectionHeader, withReuseIdentifier: ReusableViewIds.SectionHeader.rawValue)
+                collectionView.register(SectionHeaderViewType.self, forSupplementaryViewOfKind:UICollectionView.elementKindSectionHeader, withReuseIdentifier: ReusableViewIds.SectionHeader.rawValue)
             case .nibFile(let nibName, let bundle, _):
-                collectionView.register(UINib(nibName: nibName, bundle: bundle), forSupplementaryViewOfKind:UICollectionElementKindSectionHeader, withReuseIdentifier: ReusableViewIds.SectionHeader.rawValue)
+                collectionView.register(UINib(nibName: nibName, bundle: bundle), forSupplementaryViewOfKind:UICollectionView.elementKindSectionHeader, withReuseIdentifier: ReusableViewIds.SectionHeader.rawValue)
             }
         }
         
@@ -283,13 +283,13 @@ open class ActionController<ActionViewType: UICollectionViewCell, ActionDataType
                     cancelButton = {
                         let cancelButton = UIButton(frame: CGRect(x: 0, y: 0, width: 100, height: settings.cancelView.height))
                         cancelButton.addTarget(self, action: #selector(ActionController.cancelButtonDidTouch(_:)), for: .touchUpInside)
-                        cancelButton.setTitle(settings.cancelView.title, for: UIControlState())
+                        cancelButton.setTitle(settings.cancelView.title, for: UIControl.State())
                         cancelButton.translatesAutoresizingMaskIntoConstraints = false
                         return cancelButton
                     }()
                     cancel.addSubview(cancelButton!)
-                    cancel.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[button]|", options: NSLayoutFormatOptions(), metrics: nil, views: ["button": cancelButton!]))
-                    cancel.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[button]|", options: NSLayoutFormatOptions(), metrics: nil, views: ["button": cancelButton!]))
+                    cancel.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[button]|", options: NSLayoutConstraint.FormatOptions(), metrics: nil, views: ["button": cancelButton!]))
+                    cancel.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[button]|", options: NSLayoutConstraint.FormatOptions(), metrics: nil, views: ["button": cancelButton!]))
                     return cancel
                 }()
             }
@@ -360,7 +360,7 @@ open class ActionController<ActionViewType: UICollectionViewCell, ActionDataType
     }
 
     open func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        if kind == UICollectionElementKindSectionHeader {
+        if kind == UICollectionView.elementKindSectionHeader {
             if (indexPath as NSIndexPath).section == 0 && hasHeader() {
                 let reusableview = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ReusableViewIds.Header.rawValue, for: indexPath) as? HeaderViewType
                 onConfigureHeader?(reusableview!, headerData!)
@@ -576,15 +576,15 @@ open class ActionController<ActionViewType: UICollectionViewCell, ActionDataType
     
     // MARK: - Event handlers
     
-    func cancelButtonDidTouch(_ sender: UIButton) {
+    @objc func cancelButtonDidTouch(_ sender: UIButton) {
         self.dismiss()
     }
     
-    func tapGestureDidRecognize(_ gesture: UITapGestureRecognizer) {
+    @objc func tapGestureDidRecognize(_ gesture: UITapGestureRecognizer) {
         self.dismiss()
     }
     
-    func swipeGestureDidRecognize(_ gesture: UISwipeGestureRecognizer) {
+    @objc func swipeGestureDidRecognize(_ gesture: UISwipeGestureRecognizer) {
         self.dismiss()
     }
     
@@ -640,7 +640,7 @@ open class ActionController<ActionViewType: UICollectionViewCell, ActionDataType
                 var cancelViewFrame = cancelView.frame
                 cancelViewFrame.size.height = settings.cancelView.height + self.view.safeAreaInsets.bottom
                 cancelView.frame = cancelViewFrame
-                cancelButton.titleEdgeInsets = UIEdgeInsetsMake(0, 0, self.view.safeAreaInsets.bottom, 0)
+                cancelButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: self.view.safeAreaInsets.bottom, right: 0)
             }
         }
         
